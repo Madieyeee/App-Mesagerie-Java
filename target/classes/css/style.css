@@ -1,0 +1,342 @@
+/* ============================================
+   Messagerie App — Charcoal & Ivory Theme
+   ============================================ */
+
+* {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* --- Color Variables via looked-up colors --- */
+.root {
+    -fx-base: #1E1E2E;
+    -fx-background: #1E1E2E;
+    -fx-control-inner-background: #2A2A3C;
+    -fx-accent: #E8C872;
+    -fx-focus-color: #E8C872;
+    -fx-faint-focus-color: transparent;
+    primary-bg: #1E1E2E;
+    sidebar-bg: #2A2A3C;
+    card-bg: #3A3A4E;
+    bubble-received: #2E2E40;
+    accent-gold: #E8C872;
+    text-primary: #F0F0F0;
+    text-secondary: #A0A0B0;
+    status-online: #4ADE80;
+    status-offline: #6B7280;
+    error-red: #F87171;
+    input-bg: #2E2E40;
+    hover-bg: #33334A;
+}
+
+/* --- Scroll Bars --- */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #3A3A4E;
+    -fx-background-radius: 4;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #4A4A5E;
+}
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* ============================================
+   LOGIN & REGISTER SCREENS
+   ============================================ */
+
+.login-root, .register-root {
+    -fx-background-color: primary-bg;
+}
+
+.auth-card {
+    -fx-background-color: sidebar-bg;
+    -fx-background-radius: 16;
+    -fx-padding: 40;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0, 0, 4);
+}
+
+.auth-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: text-primary;
+}
+
+.auth-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: text-secondary;
+}
+
+.auth-field {
+    -fx-background-color: input-bg;
+    -fx-background-radius: 10;
+    -fx-border-color: transparent;
+    -fx-border-radius: 10;
+    -fx-text-fill: text-primary;
+    -fx-prompt-text-fill: text-secondary;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+}
+
+.auth-field:focused {
+    -fx-border-color: accent-gold;
+    -fx-border-width: 1.5;
+}
+
+.auth-btn {
+    -fx-background-color: accent-gold;
+    -fx-text-fill: #1E1E2E;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 12 32;
+    -fx-cursor: hand;
+}
+
+.auth-btn:hover {
+    -fx-background-color: #D4B563;
+}
+
+.auth-btn:pressed {
+    -fx-background-color: #C0A455;
+}
+
+.auth-link {
+    -fx-text-fill: accent-gold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.auth-link:hover {
+    -fx-underline: true;
+}
+
+.error-label {
+    -fx-text-fill: error-red;
+    -fx-font-size: 13px;
+}
+
+.server-field {
+    -fx-background-color: input-bg;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-text-fill: text-secondary;
+    -fx-prompt-text-fill: #6B7280;
+    -fx-padding: 8 12;
+    -fx-font-size: 12px;
+}
+
+.server-field:focused {
+    -fx-border-color: accent-gold;
+    -fx-border-width: 1;
+}
+
+.server-label {
+    -fx-text-fill: text-secondary;
+    -fx-font-size: 12px;
+}
+
+/* ============================================
+   CHAT SCREEN
+   ============================================ */
+
+.chat-root {
+    -fx-background-color: primary-bg;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    -fx-background-color: sidebar-bg;
+}
+
+.sidebar-header {
+    -fx-background-color: sidebar-bg;
+    -fx-padding: 20 16;
+}
+
+.sidebar-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: text-primary;
+}
+
+.current-user-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: accent-gold;
+}
+
+.user-list-view {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.user-list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 12 16;
+    -fx-text-fill: text-primary;
+    -fx-font-size: 14px;
+}
+
+.user-list-view .list-cell:hover {
+    -fx-background-color: hover-bg;
+}
+
+.user-list-view .list-cell:selected {
+    -fx-background-color: card-bg;
+    -fx-text-fill: text-primary;
+}
+
+.user-list-view .list-cell:selected:hover {
+    -fx-background-color: card-bg;
+}
+
+.user-list-view .list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.logout-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: error-red;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+    -fx-border-color: error-red;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.logout-btn:hover {
+    -fx-background-color: rgba(248, 113, 113, 0.1);
+}
+
+/* --- Chat Area --- */
+.chat-header {
+    -fx-background-color: sidebar-bg;
+    -fx-padding: 16 20;
+    -fx-border-color: #33334A;
+    -fx-border-width: 0 0 1 0;
+}
+
+.chat-header-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: text-primary;
+}
+
+.chat-header-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: text-secondary;
+}
+
+.messages-scroll {
+    -fx-background: primary-bg;
+    -fx-background-color: primary-bg;
+}
+
+.messages-container {
+    -fx-background-color: primary-bg;
+    -fx-padding: 16;
+}
+
+/* --- Message Bubbles --- */
+.message-bubble-sent {
+    -fx-background-color: card-bg;
+    -fx-background-radius: 16 16 4 16;
+    -fx-padding: 10 14;
+}
+
+.message-bubble-received {
+    -fx-background-color: bubble-received;
+    -fx-background-radius: 16 16 16 4;
+    -fx-padding: 10 14;
+}
+
+.message-text {
+    -fx-text-fill: text-primary;
+    -fx-font-size: 14px;
+}
+
+.message-time {
+    -fx-text-fill: text-secondary;
+    -fx-font-size: 11px;
+}
+
+/* --- Input Area --- */
+.input-area {
+    -fx-background-color: sidebar-bg;
+    -fx-padding: 12 16;
+    -fx-border-color: #33334A;
+    -fx-border-width: 1 0 0 0;
+}
+
+.message-input {
+    -fx-background-color: input-bg;
+    -fx-background-radius: 20;
+    -fx-border-color: transparent;
+    -fx-border-radius: 20;
+    -fx-text-fill: text-primary;
+    -fx-prompt-text-fill: text-secondary;
+    -fx-padding: 10 16;
+    -fx-font-size: 14px;
+}
+
+.message-input:focused {
+    -fx-border-color: accent-gold;
+    -fx-border-width: 1.5;
+}
+
+.send-btn {
+    -fx-background-color: accent-gold;
+    -fx-text-fill: #1E1E2E;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 10 24;
+    -fx-cursor: hand;
+}
+
+.send-btn:hover {
+    -fx-background-color: #D4B563;
+}
+
+.send-btn:pressed {
+    -fx-background-color: #C0A455;
+}
+
+/* --- No Chat Selected Placeholder --- */
+.no-chat-placeholder {
+    -fx-text-fill: text-secondary;
+    -fx-font-size: 16px;
+}
+
+/* --- Status Indicators --- */
+.status-online {
+    -fx-fill: status-online;
+}
+
+.status-offline {
+    -fx-fill: status-offline;
+}
+
+/* --- Connection Error Banner --- */
+.error-banner {
+    -fx-background-color: error-red;
+    -fx-padding: 8 16;
+}
+
+.error-banner-text {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}

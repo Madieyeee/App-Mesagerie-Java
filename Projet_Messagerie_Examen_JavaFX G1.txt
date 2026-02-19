@@ -1,0 +1,62 @@
+Projet : Application de Messagerie Instantanée (Type WhatsApp)
+
+1. Contexte
+L’entreprise souhaite mettre en place une application de messagerie interne permettant aux utilisateurs de communiquer en temps réel via un système client-serveur.
+L’application doit permettre l’authentification des utilisateurs, l’échange de messages en temps réel, la sauvegarde des données en base et l’affichage des conversations via JavaFX.
+
+2. Technologies à utilizer
+- Java 17 ou supérieur
+- JavaFX pour l’interface graphique
+- Sockets Java (ServerSocket, Socket)
+- Hibernate/JPA pour la persistance
+- Base de données MySQL ou PostgreSQL
+- Programmation Orientée Objet (POO)
+
+3. Architecture
+L’application doit suivre une architecture client-serveur.
+Le serveur gère les connexions, les utilisateurs actifs, l’envoi et la réception des messages ainsi que l’accès à la base de données.
+Le client JavaFX permet la connexion, l’affichage des utilisateurs et l’échange de messages.
+
+4. Fonctionnalités principales
+Gestion des comptes
+- Inscription
+- Connexion et déconnexion
+- Gestion du statut (en ligne / hors ligne)
+Messagerie
+- Envoi de message à un utilisateur
+- Réception en temps réel
+- Consultation de l’historique
+- Affichage des utilisateurs connectés
+
+5. Modèle de données
+User:
+- id
+- username
+- password
+- status (ONLINE / OFFLINE)
+- dateCreation
+
+Message:
+- id
+- sender
+- receiver
+- contenu
+- dateEnvoi
+- statut (ENVOYE, RECU, LU)
+
+6. Règles de gestion
+RG1 : Le username doit être unique.
+RG2 : Un utilisateur doit être authentifié pour envoyer ou consulter des messages.
+RG3 : Un utilisateur ne peut être connecté qu’une seule fois à la fois.
+RG4 : À la connexion le statut devient ONLINE, à la déconnexion ou perte réseau il devient OFFLINE.
+RG5 : Un message ne peut être envoyé que si l’expéditeur est connecté et que le
+destinataire existe.
+RG6 : Si le destinataire est hors ligne, le message est enregistré et livré lors de sa prochaine connexion.
+RG7 : Le contenu du message ne doit pas être vide et ne doit pas dépasser 1000
+caractères.
+RG8 : L’historique des messages doit être affiché par ordre chronologique.
+RG9 : Les mots de passe doivent être stockés sous forme hachée.
+RG10 : En cas de perte de connexion au serveur, le client doit afficher une erreur et passer hors ligne.
+RG11 : Chaque client doit être géré dans un thread séparé côté serveur.
+RG12 : Le serveur doit journaliser les connexions, déconnexions et envois de messages.
+

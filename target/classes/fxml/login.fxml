@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.messagerie.ui.LoginController"
+           styleClass="login-root"
+           prefWidth="500" prefHeight="550">
+
+    <VBox styleClass="auth-card" maxWidth="380" maxHeight="480" alignment="CENTER" spacing="16">
+        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+        <Label text="Messagerie" styleClass="auth-title"/>
+        <Label text="Connectez-vous pour continuer" styleClass="auth-subtitle"/>
+
+        <Region prefHeight="8"/>
+
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Serveur :" styleClass="server-label"/>
+            <TextField fx:id="serverField" promptText="localhost" styleClass="server-field" prefWidth="160"/>
+            <Label text=":" styleClass="server-label"/>
+            <TextField fx:id="portField" promptText="12345" styleClass="server-field" prefWidth="80"/>
+        </HBox>
+
+        <TextField fx:id="usernameField" promptText="Nom d'utilisateur" styleClass="auth-field"/>
+        <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="auth-field"/>
+
+        <Label fx:id="errorLabel" styleClass="error-label" wrapText="true"/>
+
+        <Region prefHeight="4"/>
+
+        <Button text="Se connecter" onAction="#handleLogin" styleClass="auth-btn" maxWidth="Infinity"/>
+
+        <HBox alignment="CENTER" spacing="4">
+            <Label text="Pas encore de compte ?" styleClass="auth-subtitle"/>
+            <Hyperlink text="S'inscrire" onAction="#goToRegister" styleClass="auth-link"/>
+        </HBox>
+    </VBox>
+</StackPane>

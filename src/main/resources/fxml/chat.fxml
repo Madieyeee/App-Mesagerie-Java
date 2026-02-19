@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.messagerie.ui.ChatController"
+            styleClass="chat-root"
+            prefWidth="900" prefHeight="600">
+
+    <!-- Sidebar -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="260" minWidth="260">
+            <!-- Header -->
+            <VBox styleClass="sidebar-header" spacing="4">
+                <Label text="Messagerie" styleClass="sidebar-title"/>
+                <Label fx:id="currentUserLabel" styleClass="current-user-label"/>
+            </VBox>
+
+            <!-- User list -->
+            <ListView fx:id="userListView" styleClass="user-list-view" VBox.vgrow="ALWAYS"/>
+
+            <!-- Logout -->
+            <HBox alignment="CENTER" style="-fx-padding: 12;">
+                <Button text="Déconnexion" onAction="#handleLogout" styleClass="logout-btn"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- Chat area -->
+    <center>
+        <VBox>
+            <!-- Error banner (hidden by default) -->
+            <HBox fx:id="errorBanner" styleClass="error-banner" visible="false" managed="false" alignment="CENTER">
+                <Label fx:id="errorBannerText" styleClass="error-banner-text"/>
+            </HBox>
+
+            <!-- Chat header -->
+            <HBox fx:id="chatHeader" styleClass="chat-header" visible="false" managed="false" alignment="CENTER_LEFT" spacing="8">
+                <VBox spacing="2">
+                    <Label fx:id="chatHeaderName" styleClass="chat-header-name"/>
+                    <Label fx:id="chatHeaderStatus" styleClass="chat-header-status"/>
+                </VBox>
+            </HBox>
+
+            <!-- Messages -->
+            <ScrollPane fx:id="messagesScroll" styleClass="messages-scroll" fitToWidth="true" VBox.vgrow="ALWAYS"
+                        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <VBox fx:id="messagesContainer" styleClass="messages-container" spacing="8"/>
+            </ScrollPane>
+
+            <!-- No chat placeholder -->
+            <StackPane fx:id="noChatPlaceholder" VBox.vgrow="ALWAYS">
+                <Label text="Sélectionnez un utilisateur pour commencer" styleClass="no-chat-placeholder"/>
+            </StackPane>
+
+            <!-- Input area -->
+            <HBox fx:id="inputArea" styleClass="input-area" visible="false" managed="false" spacing="10" alignment="CENTER">
+                <TextField fx:id="messageInput" styleClass="message-input" promptText="Écrire un message..."
+                           HBox.hgrow="ALWAYS" onAction="#handleSendMessage"/>
+                <Button text="Envoyer" onAction="#handleSendMessage" styleClass="send-btn"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
