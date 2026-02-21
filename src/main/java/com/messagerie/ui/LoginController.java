@@ -1,6 +1,7 @@
 package com.messagerie.ui;
 
 import com.messagerie.client.ChatClient;
+import com.messagerie.config.AppConfig;
 import com.messagerie.protocol.Protocol;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -9,8 +10,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LoginController {
+
+    private static final Logger LOG = Logger.getLogger(LoginController.class.getName());
 
     @FXML private TextField serverField;
     @FXML private TextField portField;
@@ -21,9 +26,15 @@ public class LoginController {
     private ChatClient client;
 
     @FXML
+    public void initialize() {
+        serverField.setPromptText(AppConfig.getServerHost());
+        portField.setPromptText(String.valueOf(AppConfig.getServerPort()));
+    }
+
+    @FXML
     public void handleLogin() {
-        String server = serverField.getText().isBlank() ? "localhost" : serverField.getText().trim();
-        String portText = portField.getText().isBlank() ? "12345" : portField.getText().trim();
+        String server = serverField.getText().isBlank() ? AppConfig.getServerHost() : serverField.getText().trim();
+        String portText = portField.getText().isBlank() ? String.valueOf(AppConfig.getServerPort()) : portField.getText().trim();
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
 
@@ -41,12 +52,11 @@ public class LoginController {
         }
 
         try {
-            client = new ChatClient();
-            client.setMessageHandler(this::handleServerResponse);
-            client.setOnDisconnect(() -> Platform.runLater(() -> showError("Connexion au serveur perdue.")));
-            client.connect(server, port);
+            client = AuthHelper.connect(server, port, this::handleServerResponse,
+                    () -> showError("Connexion au serveur perdue."));
             client.login(username, password);
         } catch (IOException e) {
+            LOG.log(Level.WARNING, "Connexion serveur échouée", e);
             showError("Impossible de se connecter au serveur: " + e.getMessage());
         }
     }

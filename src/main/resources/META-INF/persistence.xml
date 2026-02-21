@@ -11,11 +11,8 @@
         <class>com.messagerie.model.Message</class>
 
         <properties>
-            <!-- MySQL connection -->
+            <!-- JDBC: overridden by HibernateUtil from config.properties / env -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/messagerie?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/>
-            <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <property name="jakarta.persistence.jdbc.password" value=""/>
 
             <!-- Hibernate settings -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

@@ -56,12 +56,17 @@ public class ClientHandler implements Runnable {
         switch (command) {
             case Protocol.LOGIN -> handleLogin(parts);
             case Protocol.REGISTER -> handleRegister(parts);
-            case Protocol.SEND_MSG -> handleSendMessage(parts);
+            case Protocol.SEND_MSG -> handleSendMessage(parseSendMessage(raw));
             case Protocol.GET_USERS -> handleGetUsers();
             case Protocol.GET_HISTORY -> handleGetHistory(parts);
             case Protocol.LOGOUT -> disconnect();
             default -> sendMessage(Protocol.buildCommand(Protocol.ERROR, "Commande inconnue"));
         }
+    }
+
+    /** MSG|receiver|content — content may contain |, so parse with limit 3. */
+    private String[] parseSendMessage(String raw) {
+        return Protocol.parseCommand(raw, 3);
     }
 
     private void handleLogin(String[] parts) {
@@ -138,7 +143,7 @@ public class ClientHandler implements Runnable {
         }
 
         String receiverUsername = parts[1];
-        String contenu = parts[2];
+        String contenu = parts[2]; // may contain | when parsed with limit 3
 
         // RG7: contenu non vide et max 1000 caractères
         if (contenu.isBlank()) {
@@ -178,12 +183,13 @@ public class ClientHandler implements Runnable {
         }
 
         if (receiverHandler != null) {
+            // INCOMING_MSG|sender|date|id|content (content last so it may contain |)
             receiverHandler.sendMessage(Protocol.buildCommand(
                     Protocol.INCOMING_MSG,
                     currentUser.getUsername(),
-                    contenu,
                     message.getDateEnvoi().toString(),
-                    String.valueOf(message.getId())
+                    String.valueOf(message.getId()),
+                    contenu
             ));
             messageDAO.updateStatus(message.getId(), MessageStatus.RECU);
         }
@@ -225,14 +231,17 @@ public class ClientHandler implements Runnable {
         List<Message> messages = messageDAO.getConversation(currentUser.getId(), otherUser.getId());
         StringBuilder sb = new StringBuilder();
         for (Message m : messages) {
-            if (sb.length() > 0) sb.append(";;");
+            if (sb.length() > 0) sb.append(Protocol.HISTORY_SEP);
+            // Contenu en Base64 pour éviter que "::" ou ";;" dans le texte casse le parsing
+            String contentEncoded = Protocol.encodePayload(m.getContenu());
             sb.append(m.getSender().getUsername())
-              .append("::").append(m.getContenu())
-              .append("::").append(m.getDateEnvoi().toString())
-              .append("::").append(m.getId());
+              .append(Protocol.HISTORY_FIELD_SEP).append(contentEncoded)
+              .append(Protocol.HISTORY_FIELD_SEP).append(m.getDateEnvoi().toString())
+              .append(Protocol.HISTORY_FIELD_SEP).append(m.getId())
+              .append(Protocol.HISTORY_FIELD_SEP).append(m.getStatut().name());
         }
 
-        sendMessage(Protocol.buildCommand(Protocol.HISTORY_DATA, sb.toString()));
+        sendMessage(Protocol.buildCommand(Protocol.HISTORY_DATA, Protocol.encodePayload(sb.toString())));
     }
 
     private void deliverPendingMessages() {
@@ -242,9 +251,9 @@ public class ClientHandler implements Runnable {
             sendMessage(Protocol.buildCommand(
                     Protocol.INCOMING_MSG,
                     m.getSender().getUsername(),
-                    m.getContenu(),
                     m.getDateEnvoi().toString(),
-                    String.valueOf(m.getId())
+                    String.valueOf(m.getId()),
+                    m.getContenu()
             ));
             messageDAO.updateStatus(m.getId(), MessageStatus.RECU);
         }

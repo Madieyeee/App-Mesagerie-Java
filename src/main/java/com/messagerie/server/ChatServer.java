@@ -1,5 +1,6 @@
 package com.messagerie.server;
 
+import com.messagerie.config.AppConfig;
 import com.messagerie.dao.HibernateUtil;
 import com.messagerie.dao.UserDAO;
 
@@ -11,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer {
 
-    private static final int PORT = 12345;
+    private final int port = AppConfig.getServerPort();
     private final Map<String, ClientHandler> connectedClients = new ConcurrentHashMap<>();
     private ServerSocket serverSocket;
 
@@ -25,8 +26,8 @@ public class ChatServer {
         userDAO.setAllOffline();
 
         try {
-            serverSocket = new ServerSocket(PORT);
-            ServerLogger.logInfo("Serveur démarré sur le port " + PORT);
+            serverSocket = new ServerSocket(port);
+            ServerLogger.logInfo("Serveur démarré sur le port " + port);
             ServerLogger.logInfo("En attente de connexions...");
 
             while (true) {

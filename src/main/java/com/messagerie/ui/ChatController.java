@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.time.LocalDateTime;
@@ -42,6 +41,7 @@ public class ChatController {
     private final ObservableList<String> userList = FXCollections.observableArrayList();
 
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public void init(ChatClient client, Long userId, String username) {
         this.client = client;
@@ -72,7 +72,7 @@ public class ChatController {
         Platform.runLater(() -> {
             switch (parts[0]) {
                 case Protocol.USER_LIST -> handleUserList(parts);
-                case Protocol.INCOMING_MSG -> handleIncomingMessage(parts);
+                case Protocol.INCOMING_MSG -> handleIncomingMessage(raw);
                 case Protocol.MSG_OK -> {}
                 case Protocol.MSG_FAIL -> handleMsgFail(parts);
                 case Protocol.HISTORY_DATA -> handleHistoryData(parts);
@@ -113,14 +113,16 @@ public class ChatController {
         userList.addAll(offlineUsers);
     }
 
-    private void handleIncomingMessage(String[] parts) {
-        if (parts.length < 4) return;
+    private void handleIncomingMessage(String raw) {
+        // INCOMING_MSG|sender|date|id|content (content last, may contain |)
+        String[] parts = Protocol.parseCommand(raw, 5);
+        if (parts.length < 5) return;
         String senderUsername = parts[1];
-        String contenu = parts[2];
-        String dateStr = parts[3];
+        String dateStr = parts[2];
+        String contenu = parts[4];
 
         if (senderUsername.equals(selectedUser)) {
-            addMessageBubble(senderUsername, contenu, dateStr, false);
+            addMessageBubble(senderUsername, contenu, dateStr, false, "RECU");
             scrollToBottom();
         }
 
@@ -139,15 +141,37 @@ public class ChatController {
         messagesContainer.getChildren().clear();
         if (parts.length < 2 || parts[1].isBlank()) return;
 
-        String[] messages = parts[1].split(";;");
+        String payload;
+        try {
+            payload = Protocol.decodePayload(parts[1]);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        String[] messages = payload.split(Protocol.HISTORY_SEP);
         for (String m : messages) {
-            String[] fields = m.split("::", -1);
-            if (fields.length >= 3) {
+            if (m.isBlank()) continue;
+            String[] fields = m.split(Protocol.HISTORY_FIELD_SEP, -1);
+            // Format: sender::base64(content)::date::id::status (5 champs pour éviter que "::" dans le contenu casse le parsing)
+            if (fields.length >= 5) {
+                String sender = fields[0];
+                String contentEncoded = fields[1];
+                String dateStr = fields[2];
+                String statusStr = fields[4];
+                String contenu;
+                try {
+                    contenu = Protocol.decodePayload(contentEncoded);
+                } catch (IllegalArgumentException e) {
+                    contenu = contentEncoded; // fallback si pas du base64
+                }
+                boolean isMine = sender.equals(currentUsername);
+                addMessageBubble(sender, contenu, dateStr, isMine, statusStr);
+            } else if (fields.length >= 3) {
+                // Ancien format sans statut / contenu non encodé (rétrocompat)
                 String sender = fields[0];
                 String contenu = fields[1];
-                String date = fields[2];
+                String dateStr = fields[2];
                 boolean isMine = sender.equals(currentUsername);
-                addMessageBubble(sender, contenu, date, isMine);
+                addMessageBubble(sender, contenu, dateStr, isMine, null);
             }
         }
         scrollToBottom();
@@ -226,9 +250,8 @@ public class ChatController {
         chatHeaderName.setText(selectedUser);
         String status = userStatuses.getOrDefault(selectedUser, "OFFLINE");
         chatHeaderStatus.setText("ONLINE".equals(status) ? "En ligne" : "Hors ligne");
-        chatHeaderStatus.setStyle("ONLINE".equals(status)
-                ? "-fx-text-fill: #4ADE80;"
-                : "-fx-text-fill: #6B7280;");
+        chatHeaderStatus.getStyleClass().removeAll("chat-header-status-online", "chat-header-status-offline");
+        chatHeaderStatus.getStyleClass().add("ONLINE".equals(status) ? "chat-header-status-online" : "chat-header-status-offline");
     }
 
     @FXML
@@ -244,7 +267,7 @@ public class ChatController {
         }
 
         client.sendMessage(selectedUser, content);
-        addMessageBubble(currentUsername, content, LocalDateTime.now().toString(), true);
+        addMessageBubble(currentUsername, content, LocalDateTime.now().toString(), true, "ENVOYE");
         scrollToBottom();
         messageInput.clear();
         messageInput.requestFocus();
@@ -261,6 +284,10 @@ public class ChatController {
     }
 
     private void addMessageBubble(String sender, String content, String dateStr, boolean isMine) {
+        addMessageBubble(sender, content, dateStr, isMine, null);
+    }
+
+    private void addMessageBubble(String sender, String content, String dateStr, boolean isMine, String statusStr) {
         VBox bubble = new VBox(4);
         bubble.setPadding(new Insets(0));
         bubble.setMaxWidth(400);
@@ -269,23 +296,33 @@ public class ChatController {
         textLabel.setWrapText(true);
         textLabel.getStyleClass().add("message-text");
 
-        String timeStr;
+        String dateTimeStr;
         try {
             LocalDateTime dt = LocalDateTime.parse(dateStr);
-            timeStr = dt.format(TIME_FORMAT);
+            dateTimeStr = dt.format(DATE_TIME_FORMAT);
         } catch (Exception e) {
-            timeStr = dateStr;
+            dateTimeStr = dateStr;
         }
 
-        Label timeLabel = new Label(timeStr);
-        timeLabel.getStyleClass().add("message-time");
+        String footerText = dateTimeStr;
+        if (statusStr != null && !statusStr.isBlank()) {
+            String statusLabel = switch (statusStr.toUpperCase()) {
+                case "RECU" -> "Reçu";
+                case "LU" -> "Lu";
+                default -> "Envoyé";
+            };
+            footerText = dateTimeStr + " · " + statusLabel;
+        }
 
-        bubble.getChildren().addAll(textLabel, timeLabel);
+        Label footerLabel = new Label(footerText);
+        footerLabel.getStyleClass().add("message-time");
+
+        bubble.getChildren().addAll(textLabel, footerLabel);
 
         if (isMine) {
             bubble.getStyleClass().add("message-bubble-sent");
             bubble.setAlignment(Pos.CENTER_RIGHT);
-            timeLabel.setAlignment(Pos.CENTER_RIGHT);
+            footerLabel.setAlignment(Pos.CENTER_RIGHT);
         } else {
             bubble.getStyleClass().add("message-bubble-received");
             bubble.setAlignment(Pos.CENTER_LEFT);
@@ -313,12 +350,13 @@ public class ChatController {
         errorBanner.setManaged(true);
     }
 
-    private void hideErrorBanner() {
+    @FXML
+    public void hideErrorBanner() {
         errorBanner.setVisible(false);
         errorBanner.setManaged(false);
     }
 
-    // Custom cell for user list with status indicator
+    /** Custom cell for user list with status indicator; styles from style.css */
     private class UserListCell extends ListCell<String> {
         @Override
         protected void updateItem(String item, boolean empty) {
@@ -332,13 +370,13 @@ public class ChatController {
 
                 Circle statusDot = new Circle(5);
                 String status = userStatuses.getOrDefault(item, "OFFLINE");
-                statusDot.setFill("ONLINE".equals(status) ? Color.web("#4ADE80") : Color.web("#6B7280"));
+                statusDot.getStyleClass().add("ONLINE".equals(status) ? "status-dot-online" : "status-dot-offline");
 
                 Label nameLabel = new Label(item);
-                nameLabel.setStyle("-fx-text-fill: #F0F0F0; -fx-font-size: 14px;");
+                nameLabel.getStyleClass().add("user-cell-name");
 
                 Label statusLabel = new Label("ONLINE".equals(status) ? "En ligne" : "Hors ligne");
-                statusLabel.setStyle("-fx-text-fill: #A0A0B0; -fx-font-size: 11px;");
+                statusLabel.getStyleClass().add("ONLINE".equals(status) ? "user-cell-status-online" : "user-cell-status-offline");
 
                 VBox textBox = new VBox(2);
                 textBox.getChildren().addAll(nameLabel, statusLabel);
