@@ -1,5 +1,7 @@
 /* ============================================
    Messagerie App — Charcoal & Ivory Theme
+   Typography: titles 20–24px, body 14px, legends 11–12px
+   Spacing grid: 4px / 8px
    ============================================ */
 
 * {
@@ -19,6 +21,7 @@
     card-bg: #3A3A4E;
     bubble-received: #2E2E40;
     accent-gold: #E8C872;
+    accent-link: #7DD3FC;
     text-primary: #F0F0F0;
     text-secondary: #A0A0B0;
     status-online: #4ADE80;
@@ -55,18 +58,19 @@
    ============================================ */
 
 .login-root, .register-root {
-    -fx-background-color: primary-bg;
+    -fx-background-color: linear-gradient(to bottom, #252536 0%, #1E1E2E 50%, #1A1A28 100%);
 }
 
 .auth-card {
     -fx-background-color: sidebar-bg;
     -fx-background-radius: 16;
-    -fx-padding: 40;
+    -fx-padding: 32 40;
+    -fx-spacing: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0, 0, 4);
 }
 
 .auth-title {
-    -fx-font-size: 28px;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-text-fill: text-primary;
 }
@@ -110,8 +114,14 @@
     -fx-background-color: #C0A455;
 }
 
+.auth-btn:disabled {
+    -fx-background-color: #3A3A4E;
+    -fx-text-fill: text-secondary;
+    -fx-opacity: 0.8;
+}
+
 .auth-link {
-    -fx-text-fill: accent-gold;
+    -fx-text-fill: accent-link;
     -fx-font-size: 13px;
     -fx-cursor: hand;
     -fx-underline: false;
@@ -119,6 +129,7 @@
 
 .auth-link:hover {
     -fx-underline: true;
+    -fx-text-fill: accent-gold;
 }
 
 .error-label {
@@ -174,6 +185,34 @@
 .current-user-label {
     -fx-font-size: 12px;
     -fx-text-fill: accent-gold;
+}
+
+/* User list cell content (used by UserListCell) */
+.user-cell-name {
+    -fx-text-fill: text-primary;
+    -fx-font-size: 14px;
+}
+
+.user-cell-status {
+    -fx-font-size: 11px;
+}
+
+.user-cell-status-online {
+    -fx-text-fill: status-online;
+    -fx-font-size: 11px;
+}
+
+.user-cell-status-offline {
+    -fx-text-fill: text-secondary;
+    -fx-font-size: 11px;
+}
+
+.status-dot-online {
+    -fx-fill: status-online;
+}
+
+.status-dot-offline {
+    -fx-fill: status-offline;
 }
 
 .user-list-view {
@@ -236,7 +275,16 @@
 
 .chat-header-status {
     -fx-font-size: 12px;
-    -fx-text-fill: text-secondary;
+}
+
+.chat-header-status-online {
+    -fx-text-fill: status-online;
+    -fx-font-size: 12px;
+}
+
+.chat-header-status-offline {
+    -fx-text-fill: status-offline;
+    -fx-font-size: 12px;
 }
 
 .messages-scroll {
@@ -254,17 +302,20 @@
     -fx-background-color: card-bg;
     -fx-background-radius: 16 16 4 16;
     -fx-padding: 10 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 2);
 }
 
 .message-bubble-received {
     -fx-background-color: bubble-received;
     -fx-background-radius: 16 16 16 4;
     -fx-padding: 10 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 1);
 }
 
 .message-text {
     -fx-text-fill: text-primary;
     -fx-font-size: 14px;
+    -fx-line-spacing: 4px;
 }
 
 .message-time {
@@ -318,6 +369,7 @@
 .no-chat-placeholder {
     -fx-text-fill: text-secondary;
     -fx-font-size: 16px;
+    -fx-alignment: center;
 }
 
 /* --- Status Indicators --- */
@@ -333,10 +385,27 @@
 .error-banner {
     -fx-background-color: error-red;
     -fx-padding: 8 16;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
 }
 
 .error-banner-text {
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-max-width: infinity;
+    -fx-wrap-text: true;
+}
+
+.error-banner-close-btn {
+    -fx-background-color: rgba(255,255,255,0.25);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+    -fx-padding: 4 12;
+}
+
+.error-banner-close-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.4);
 }
