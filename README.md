@@ -8,16 +8,16 @@ Application de messagerie instantanée **client-serveur** en Java (type WhatsApp
 
 ## Sommaire
 
-- [Technologies et dépendances](#-technologies-et-dépendances)
-- [Structure du projet](#-structure-du-projet)
-- [Architecture globale](#-architecture-globale)
-- [Fonctionnalités et règles de gestion](#-fonctionnalités-et-règles-de-gestion)
-- [Configuration](#-configuration)
-- [Base de données](#-base-de-données)
-- [Installation et lancement](#-installation-et-lancement)
-- [Protocole réseau (développeurs)](#-protocole-réseau-développeurs)
-- [Interface utilisateur (design)](#-interface-utilisateur-design)
-- [Dépannage](#-dépannage)
+- [Technologies et dépendances](#technologies-et-dépendances)
+- [Structure du projet](#structure-du-projet)
+- [Architecture globale](#architecture-globale)
+- [Fonctionnalités et règles de gestion](#fonctionnalités-et-règles-de-gestion)
+- [Configuration](#configuration)
+- [Base de données](#base-de-données)
+- [Installation et lancement](#installation-et-lancement)
+- [Protocole réseau (développeurs)](#protocole-réseau-développeurs)
+- [Interface utilisateur (design)](#interface-utilisateur-design)
+- [Dépannage](#dépannage)
 
 ---
 
