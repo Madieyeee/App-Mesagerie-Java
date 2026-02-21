@@ -8,11 +8,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainApp extends Application {
 
+    private static final Logger LOG = Logger.getLogger(MainApp.class.getName());
+
     private static MainApp instance;
     private Stage primaryStage;
+    private ChatClient currentChatClient;
 
     public static MainApp getInstance() {
         return instance;
@@ -30,6 +35,7 @@ public class MainApp extends Application {
     }
 
     public void showLogin() {
+        currentChatClient = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             Parent root = loader.load();
@@ -38,11 +44,12 @@ public class MainApp extends Application {
             primaryStage.setScene(scene);
             primaryStage.setTitle("Messagerie — Connexion");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Erreur chargement écran connexion", e);
         }
     }
 
     public void showRegister() {
+        currentChatClient = null;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
             Parent root = loader.load();
@@ -51,11 +58,12 @@ public class MainApp extends Application {
             primaryStage.setScene(scene);
             primaryStage.setTitle("Messagerie — Inscription");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Erreur chargement écran inscription", e);
         }
     }
 
     public void showChat(ChatClient client, Long userId, String username) {
+        currentChatClient = client;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/chat.fxml"));
             Parent root = loader.load();
@@ -69,13 +77,16 @@ public class MainApp extends Application {
             primaryStage.setMinWidth(700);
             primaryStage.setMinHeight(500);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Erreur chargement écran chat", e);
         }
     }
 
     @Override
     public void stop() {
-        // Cleanup on app close
+        if (currentChatClient != null) {
+            currentChatClient.disconnect();
+            currentChatClient = null;
+        }
     }
 
     public static void main(String[] args) {
