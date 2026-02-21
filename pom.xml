@@ -78,6 +78,24 @@
                     <mainClass>com.messagerie.ui.MainApp</mainClass>
                 </configuration>
             </plugin>
+            <!-- Lancer le serveur avec: mvn exec:java@server (évite les soucis -D sous PowerShell) -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>server</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.messagerie.server.ChatServer</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -32,8 +32,9 @@
     <center>
         <VBox>
             <!-- Error banner (hidden by default) -->
-            <HBox fx:id="errorBanner" styleClass="error-banner" visible="false" managed="false" alignment="CENTER">
-                <Label fx:id="errorBannerText" styleClass="error-banner-text"/>
+            <HBox fx:id="errorBanner" styleClass="error-banner" visible="false" managed="false" alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="errorBannerText" styleClass="error-banner-text" HBox.hgrow="ALWAYS"/>
+                <Button text="Fermer" onAction="#hideErrorBanner" styleClass="error-banner-close-btn"/>
             </HBox>
 
             <!-- Chat header -->
