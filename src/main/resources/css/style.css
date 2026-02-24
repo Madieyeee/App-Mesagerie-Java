@@ -306,7 +306,7 @@
 }
 
 .message-bubble-received {
-    -fx-background-color: bubble-received;
+    -fx-background-color: accent-gold;
     -fx-background-radius: 16 16 16 4;
     -fx-padding: 10 14;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 1);

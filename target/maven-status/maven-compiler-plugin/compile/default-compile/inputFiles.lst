@@ -1,19 +1,19 @@
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\client\ChatClient.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\config\AppConfig.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\dao\HibernateUtil.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\dao\MessageDAO.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\dao\UserDAO.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\model\Message.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\model\MessageStatus.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\model\User.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\model\UserStatus.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\protocol\Protocol.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\server\ChatServer.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\server\ClientHandler.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\server\ServerLogger.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\ui\AuthHelper.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\ui\ChatController.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\ui\LoginController.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\ui\MainApp.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\com\messagerie\ui\RegisterController.java
-C:\Users\bmd-tech\Documents\L3  Génie Logiciel\POO Java\App-Mesagerie-Java\src\main\java\module-info.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\client\ChatClient.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\config\AppConfig.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\dao\HibernateUtil.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\dao\MessageDAO.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\dao\UserDAO.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\model\Message.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\model\MessageStatus.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\model\User.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\model\UserStatus.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\protocol\Protocol.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\server\ChatServer.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\server\ClientHandler.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\server\ServerLogger.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\ui\AuthHelper.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\ui\ChatController.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\ui\LoginController.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\ui\MainApp.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\com\messagerie\ui\RegisterController.java
+C:\Users\HP\Desktop\COURS\ISI L3\JAVA\App-Mesagerie-Java\src\main\java\module-info.java
