@@ -246,6 +246,13 @@ public class ChatController {
 
     private void handleError(String[] parts) {
         String msg = parts.length > 1 ? parts[1] : "Erreur inconnue.";
+        
+        // Ne pas afficher les erreurs de commande inconnue pour éviter les notifications intempestives
+        if (msg.contains("Commande inconnue") || msg.contains("commande inconnue")) {
+            System.err.println("Erreur de commande ignorée: " + msg);
+            return;
+        }
+        
         showErrorBanner(msg);
     }
 
