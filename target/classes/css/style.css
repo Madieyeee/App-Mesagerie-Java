@@ -323,6 +323,45 @@
     -fx-font-size: 11px;
 }
 
+/* --- Typing Indicator --- */
+.typing-indicator {
+    -fx-background-color: transparent;
+}
+
+.typing-text {
+    -fx-text-fill: text-secondary;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+/* --- Message Reactions --- */
+.reaction-container {
+    -fx-spacing: 4;
+}
+
+.reaction-btn {
+    -fx-background-color: rgba(232, 200, 114, 0.2);
+    -fx-text-fill: text-primary;
+    -fx-font-size: 14px;
+    -fx-background-radius: 12;
+    -fx-padding: 2 8;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(232, 200, 114, 0.3);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
+.reaction-btn:hover {
+    -fx-background-color: rgba(232, 200, 114, 0.4);
+    -fx-border-color: accent-gold;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.reaction-btn:pressed {
+    -fx-background-color: rgba(232, 200, 114, 0.6);
+}
+
 /* --- Input Area --- */
 .input-area {
     -fx-background-color: sidebar-bg;
