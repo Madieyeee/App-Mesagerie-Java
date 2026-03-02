@@ -86,18 +86,25 @@ public class ChatController {
         if (parts.length == 0) return;
 
         Platform.runLater(() -> {
-            switch (parts[0]) {
-                case Protocol.USER_LIST -> handleUserList(parts);
-                case Protocol.INCOMING_MSG -> handleIncomingMessage(raw);
-                case Protocol.MSG_OK -> {}
-                case Protocol.MSG_FAIL -> handleMsgFail(parts);
-                case Protocol.HISTORY_DATA -> handleHistoryData(parts);
-                case Protocol.USER_STATUS_CHANGE -> handleUserStatusChange(parts);
-                case Protocol.TYPING_INDICATOR -> handleTypingIndicator(parts);
-                case Protocol.REACTION_ADDED -> handleReactionAdded(parts);
-                case Protocol.MSG_STATUS_UPDATE -> handleMessageStatusUpdate(parts);
-                case Protocol.ERROR -> handleError(parts);
-                default -> {}
+            try {
+                switch (parts[0]) {
+                    case Protocol.USER_LIST -> handleUserList(parts);
+                    case Protocol.INCOMING_MSG -> handleIncomingMessage(raw);
+                    case Protocol.MSG_OK -> {}
+                    case Protocol.MSG_FAIL -> handleMsgFail(parts);
+                    case Protocol.HISTORY_DATA -> handleHistoryData(parts);
+                    case Protocol.USER_STATUS_CHANGE -> handleUserStatusChange(parts);
+                    case Protocol.TYPING_INDICATOR -> handleTypingIndicator(parts);
+                    case Protocol.REACTION_ADDED -> handleReactionAdded(parts);
+                    case Protocol.MSG_STATUS_UPDATE -> handleMessageStatusUpdate(parts);
+                    case Protocol.ERROR -> handleError(parts);
+                    default -> {
+                        // Ignorer silencieusement les commandes inconnues pour éviter les erreurs
+                        System.err.println("Commande inconnue ignorée: " + raw);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors du traitement du message: " + e.getMessage());
             }
         });
     }
