@@ -21,6 +21,10 @@ public class Protocol {
     public static final String SEND_MSG = "MSG";
     public static final String GET_USERS = "USERLIST";
     public static final String GET_HISTORY = "HISTORY";
+    public static final String TYPING_START = "TYPING_START";
+    public static final String TYPING_STOP = "TYPING_STOP";
+    public static final String ADD_REACTION = "ADD_REACTION";
+    public static final String MSG_READ = "MSG_READ";
 
     // Server -> Client responses
     public static final String LOGIN_OK = "LOGIN_OK";
@@ -37,6 +41,12 @@ public class Protocol {
     public static final String USER_STATUS_CHANGE = "USER_STATUS_CHANGE";
     public static final String ERROR = "ERROR";
     public static final String ALREADY_CONNECTED = "ALREADY_CONNECTED";
+    /** Format: TYPING_INDICATOR|username|action (START/STOP) */
+    public static final String TYPING_INDICATOR = "TYPING_INDICATOR";
+    /** Format: REACTION_ADDED|messageId|username|emoji */
+    public static final String REACTION_ADDED = "REACTION_ADDED";
+    /** Format: MSG_STATUS_UPDATE|messageId|status (RECU/LU) */
+    public static final String MSG_STATUS_UPDATE = "MSG_STATUS_UPDATE";
 
     public static String buildCommand(String... parts) {
         return String.join(SEPARATOR, parts);
