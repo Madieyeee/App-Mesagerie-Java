@@ -8,8 +8,13 @@ import jakarta.persistence.EntityTransaction;
 
 import java.util.List;
 
+/**
+ * Couche d'accès aux données pour les messages (table "messages").
+ * Sauvegarde, récupération des conversations, messages en attente et mise à jour des statuts.
+ */
 public class MessageDAO {
 
+    /** Enregistre un nouveau message en base et retourne l'entité avec son ID généré. */
     public Message save(Message message) {
         EntityManager em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -27,7 +32,10 @@ public class MessageDAO {
         }
     }
 
-    // RG8: historique par ordre chronologique
+    /**
+     * Récupère l'historique de la conversation entre deux utilisateurs.
+     * RG8 : messages triés par date d'envoi (ordre chronologique).
+     */
     public List<Message> getConversation(Long userId1, Long userId2) {
         EntityManager em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         try {
@@ -44,7 +52,10 @@ public class MessageDAO {
         }
     }
 
-    // RG6: messages en attente pour un utilisateur hors ligne
+    /**
+     * Messages envoyés à un utilisateur qui était déconnecté (statut ENVOYE).
+     * RG6 : à la connexion, le serveur livre ces messages "en attente".
+     */
     public List<Message> getPendingMessages(Long receiverId) {
         EntityManager em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         try {
@@ -59,6 +70,7 @@ public class MessageDAO {
         }
     }
 
+    /** Met à jour le statut d'un message (ex: ENVOYE -> RECU ou LU). */
     public void updateStatus(Long messageId, MessageStatus status) {
         EntityManager em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -78,6 +90,7 @@ public class MessageDAO {
         }
     }
 
+    /** Passe tous les messages "ENVOYE" destinés à cet utilisateur en "RECU" (livraison groupée). */
     public void markAsReceived(Long receiverId) {
         EntityManager em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         EntityTransaction tx = em.getTransaction();

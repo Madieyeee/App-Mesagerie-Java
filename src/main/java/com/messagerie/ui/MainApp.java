@@ -11,13 +11,18 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Point d'entrée de l'application JavaFX (côté client).
+ * Gère la fenêtre principale et la navigation entre les écrans : connexion, inscription, chat.
+ * Chaque écran est un fichier FXML chargé avec FXMLLoader et un contrôleur associé.
+ */
 public class MainApp extends Application {
 
     private static final Logger LOG = Logger.getLogger(MainApp.class.getName());
 
-    private static MainApp instance;
-    private Stage primaryStage;
-    private ChatClient currentChatClient;
+    private static MainApp instance;   // Singleton pour que les contrôleurs puissent demander un changement d'écran
+    private Stage primaryStage;         // Fenêtre principale JavaFX
+    private ChatClient currentChatClient;  // Client connecté (null sur écran login/register)
 
     public static MainApp getInstance() {
         return instance;
@@ -30,10 +35,11 @@ public class MainApp extends Application {
         primaryStage.setTitle("Messagerie");
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(550);
-        showLogin();
+        showLogin();   // Premier écran affiché
         primaryStage.show();
     }
 
+    /** Affiche l'écran de connexion (login.fxml). Réinitialise le client. */
     public void showLogin() {
         currentChatClient = null;
         try {
@@ -48,6 +54,7 @@ public class MainApp extends Application {
         }
     }
 
+    /** Affiche l'écran d'inscription (register.fxml). */
     public void showRegister() {
         currentChatClient = null;
         try {
@@ -62,6 +69,7 @@ public class MainApp extends Application {
         }
     }
 
+    /** Affiche l'écran de chat (chat.fxml) avec le client déjà connecté et les infos utilisateur. */
     public void showChat(ChatClient client, Long userId, String username) {
         currentChatClient = client;
         try {
@@ -81,6 +89,7 @@ public class MainApp extends Application {
         }
     }
 
+    /** À la fermeture de l'application, déconnecte le client proprement. */
     @Override
     public void stop() {
         if (currentChatClient != null) {

@@ -7,20 +7,22 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- * Factorises connection and handler setup for login/register screens.
+ * Utilitaire pour la connexion au serveur depuis les écrans de connexion et d'inscription.
+ * Crée un ChatClient, configure le handler des messages et le callback de déconnexion.
+ * Important : le callback onDisconnect est exécuté sur le thread JavaFX (Platform.runLater)
+ * car les réponses du serveur arrivent dans un autre thread.
  */
 public final class AuthHelper {
 
-    private AuthHelper() {}
+    private AuthHelper() {}  // Classe utilitaire : pas d'instanciation
 
     /**
-     * Creates a ChatClient, connects to the server, and sets the message handler and disconnect callback.
-     * @param server host
-     * @param port port
-     * @param onMessage called on each line received (may be from any thread)
-     * @param onDisconnect called when connection is lost (will be run on JavaFX thread if needed)
-     * @return connected client
-     * @throws IOException if connection fails
+     * Crée un client, se connecte au serveur et enregistre les callbacks.
+     * @param server adresse du serveur
+     * @param port port du serveur
+     * @param onMessage appelé à chaque ligne reçue (peut être appelé depuis le thread réseau)
+     * @param onDisconnect appelé quand la connexion est perdue (sera exécuté sur le thread JavaFX si besoin)
+     * @return le client connecté
      */
     public static ChatClient connect(String server, int port,
                                     Consumer<String> onMessage,
@@ -28,6 +30,7 @@ public final class AuthHelper {
         ChatClient client = new ChatClient();
         client.setMessageHandler(onMessage);
         client.setOnDisconnect(() -> {
+            // Les mises à jour de l'interface JavaFX doivent être faites sur le thread JavaFX
             if (Platform.isFxApplicationThread()) {
                 onDisconnect.run();
             } else {

@@ -1,0 +1,28 @@
+# Fichiers compilés Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Dossiers de compilation
+target/
+bin/
+out/
+build/
+
+# Fichiers IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Logs et fichiers temporaires
+*.log
+*.tmp
+*.bak
+
+# Configuration locale (si besoin de ne pas partager)
+# config.properties

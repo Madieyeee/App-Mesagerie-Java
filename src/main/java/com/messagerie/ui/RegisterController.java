@@ -13,6 +13,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Contrôleur de l'écran d'inscription (register.fxml).
+ * Vérifie que les champs sont remplis, que les mots de passe correspondent et font au moins 4 caractères,
+ * se connecte au serveur, envoie REGISTER et réagit à REGISTER_OK (retour à la connexion) ou REGISTER_FAIL.
+ */
 public class RegisterController {
 
     private static final Logger LOG = Logger.getLogger(RegisterController.class.getName());
@@ -32,6 +37,7 @@ public class RegisterController {
         portField.setPromptText(String.valueOf(AppConfig.getServerPort()));
     }
 
+    /** Clic sur "S'inscrire" : validation, connexion, envoi de REGISTER. */
     @FXML
     public void handleRegister() {
         String server = serverField.getText().isBlank() ? AppConfig.getServerHost() : serverField.getText().trim();
@@ -73,6 +79,7 @@ public class RegisterController {
         }
     }
 
+    /** Réponse du serveur : REGISTER_OK -> retour à l'écran de connexion ; REGISTER_FAIL -> afficher l'erreur. */
     private void handleServerResponse(String raw) {
         String[] parts = Protocol.parseCommand(raw);
         if (parts.length == 0) return;
@@ -97,6 +104,7 @@ public class RegisterController {
         errorLabel.setText(message);
     }
 
+    /** Clic sur "Se connecter" : retour à l'écran de connexion. */
     @FXML
     public void goToLogin() {
         if (client != null) client.disconnect();

@@ -14,16 +14,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Gère la communication avec un seul client connecté au serveur.
+ * S'exécute dans un thread dédié : lit les commandes (ligne par ligne), les traite et envoie les réponses.
+ * Implémente Runnable pour être lancé dans un Thread par ChatServer.
+ */
 public class ClientHandler implements Runnable {
 
-    private final Socket socket;
-    private final Map<String, ClientHandler> connectedClients;
-    private BufferedReader in;
-    private PrintWriter out;
-    private User currentUser;
+    private final Socket socket;                           // Socket TCP vers le client
+    private final Map<String, ClientHandler> connectedClients;  // Référence partagée avec le serveur
+    private BufferedReader in;                             // Lecture des lignes envoyées par le client
+    private PrintWriter out;                                // Envoi des réponses au client
+    private User currentUser;                               // Utilisateur connecté (null tant que non logué)
     private final UserDAO userDAO = new UserDAO();
     private final MessageDAO messageDAO = new MessageDAO();
-    private volatile boolean running = true;
+    private volatile boolean running = true;                // volatile pour visibilité entre threads
 
     public ClientHandler(Socket socket, Map<String, ClientHandler> connectedClients) {
         this.socket = socket;
@@ -37,6 +42,7 @@ public class ClientHandler implements Runnable {
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 
             String line;
+            // Boucle principale : lire une ligne, traiter la commande, répéter
             while (running && (line = in.readLine()) != null) {
                 handleCommand(line);
             }
@@ -47,6 +53,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /** Découpe la ligne reçue et appelle le bon gestionnaire selon la commande (premier champ). */
     private void handleCommand(String raw) {
         String[] parts = Protocol.parseCommand(raw);
         if (parts.length == 0) return;
@@ -64,11 +71,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /** MSG|receiver|content — content may contain |, so parse with limit 3. */
+    /** MSG|destinataire|contenu — le contenu peut contenir des |, donc on découpe avec max 3 parties. */
     private String[] parseSendMessage(String raw) {
         return Protocol.parseCommand(raw, 3);
     }
 
+    /** Traite LOGIN|username|password : authentification et enregistrement dans connectedClients. */
     private void handleLogin(String[] parts) {
         if (parts.length < 3) {
             sendMessage(Protocol.buildCommand(Protocol.LOGIN_FAIL, "Paramètres manquants"));
@@ -83,7 +91,7 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // RG3: connexion unique
+        // RG3: un seul client connecté par compte (éviter deux sessions avec le même user)
         synchronized (connectedClients) {
             if (connectedClients.containsKey(username)) {
                 sendMessage(Protocol.buildCommand(Protocol.ALREADY_CONNECTED, "Cet utilisateur est déjà connecté"));
@@ -102,10 +110,11 @@ public class ClientHandler implements Runnable {
         // Notifier les autres utilisateurs du changement de statut
         broadcastStatusChange(username, "ONLINE");
 
-        // RG6: livrer les messages en attente
+        // RG6: à la connexion, envoyer les messages reçus pendant l'absence
         deliverPendingMessages();
     }
 
+    /** Traite REGISTER|username|password : création du compte en base (username unique). */
     private void handleRegister(String[] parts) {
         if (parts.length < 3) {
             sendMessage(Protocol.buildCommand(Protocol.REGISTER_FAIL, "Paramètres manquants"));
@@ -130,6 +139,7 @@ public class ClientHandler implements Runnable {
         sendMessage(Protocol.buildCommand(Protocol.REGISTER_OK, "Inscription réussie"));
     }
 
+    /** Traite MSG|destinataire|contenu : enregistre en BDD et envoie au destinataire s'il est connecté. */
     private void handleSendMessage(String[] parts) {
         // RG2: doit être authentifié
         if (currentUser == null) {
@@ -143,8 +153,8 @@ public class ClientHandler implements Runnable {
         }
 
         String receiverUsername = parts[1];
-        String contenu = parts[2]; // may contain | when parsed with limit 3
-
+        String contenu = parts[2];
+        
         // RG7: contenu non vide et max 1000 caractères
         if (contenu.isBlank()) {
             sendMessage(Protocol.buildCommand(Protocol.MSG_FAIL, "Le message ne peut pas être vide"));
@@ -162,7 +172,7 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // Recharger le sender depuis la BDD pour éviter les entités détachées
+        // Recharger l'expéditeur depuis la BDD pour que Hibernate gère correctement les entités (éviter "detached")
         User sender = userDAO.findByUsername(currentUser.getUsername());
 
         Message message = new Message(sender, receiver, contenu);
@@ -176,14 +186,13 @@ public class ClientHandler implements Runnable {
         ServerLogger.logMessage(currentUser.getUsername(), receiverUsername);
         sendMessage(Protocol.buildCommand(Protocol.MSG_OK, String.valueOf(message.getId())));
 
-        // Envoyer au destinataire s'il est connecté
+        // Si le destinataire est connecté, lui envoyer le message tout de suite et passer le statut à RECU
         ClientHandler receiverHandler;
         synchronized (connectedClients) {
             receiverHandler = connectedClients.get(receiverUsername);
         }
 
         if (receiverHandler != null) {
-            // INCOMING_MSG|sender|date|id|content (content last so it may contain |)
             receiverHandler.sendMessage(Protocol.buildCommand(
                     Protocol.INCOMING_MSG,
                     currentUser.getUsername(),
@@ -193,9 +202,10 @@ public class ClientHandler implements Runnable {
             ));
             messageDAO.updateStatus(message.getId(), MessageStatus.RECU);
         }
-        // RG6: si hors ligne, le message reste en BDD avec statut ENVOYE
+        // RG6: Si le destinataire est hors ligne, le message reste en BDD avec statut ENVOYE et sera livré à sa connexion
     }
 
+    /** Envoie la liste des utilisateurs (username:statut) au client, sauf lui-même. */
     private void handleGetUsers() {
         if (currentUser == null) {
             sendMessage(Protocol.buildCommand(Protocol.ERROR, "Non authentifié"));
@@ -211,6 +221,7 @@ public class ClientHandler implements Runnable {
         sendMessage(Protocol.buildCommand(Protocol.USER_LIST, userListStr));
     }
 
+    /** Envoie l'historique de la conversation avec l'utilisateur donné (HISTORY|otherUsername). Données encodées en Base64. */
     private void handleGetHistory(String[] parts) {
         if (currentUser == null) {
             sendMessage(Protocol.buildCommand(Protocol.ERROR, "Non authentifié"));
@@ -244,6 +255,7 @@ public class ClientHandler implements Runnable {
         sendMessage(Protocol.buildCommand(Protocol.HISTORY_DATA, Protocol.encodePayload(sb.toString())));
     }
 
+    /** Livre les messages en attente (statut ENVOYE) au client qui vient de se connecter. */
     private void deliverPendingMessages() {
         if (currentUser == null) return;
         List<Message> pending = messageDAO.getPendingMessages(currentUser.getId());
@@ -259,6 +271,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /** Notifie tous les autres clients connectés du changement de statut d'un utilisateur. */
     private void broadcastStatusChange(String username, String status) {
         synchronized (connectedClients) {
             for (Map.Entry<String, ClientHandler> entry : connectedClients.entrySet()) {
@@ -271,17 +284,19 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /** Envoie une ligne de texte au client (thread-safe : appelé depuis ce thread ou depuis un autre handler). */
     public void sendMessage(String message) {
         if (out != null) {
             out.println(message);
         }
     }
 
+    /** Déconnecte le client : statut OFFLINE, retrait de la map, fermeture de la socket. */
     private void disconnect() {
         running = false;
         if (currentUser != null) {
             String username = currentUser.getUsername();
-            // RG4: statut OFFLINE
+// RG4: statut OFFLINE
             userDAO.updateStatus(currentUser.getId(), UserStatus.OFFLINE);
             synchronized (connectedClients) {
                 connectedClients.remove(username);

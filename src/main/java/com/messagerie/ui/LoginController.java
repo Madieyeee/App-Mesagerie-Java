@@ -13,10 +13,16 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Contrôleur de l'écran de connexion (login.fxml).
+ * Récupère serveur/port/utilisateur/mot de passe, se connecte via AuthHelper, envoie LOGIN
+ * et réagit aux réponses LOGIN_OK / LOGIN_FAIL / ALREADY_CONNECTED.
+ */
 public class LoginController {
 
     private static final Logger LOG = Logger.getLogger(LoginController.class.getName());
 
+    // Champs liés au FXML par @FXML (même nom que fx:id dans le fichier .fxml)
     @FXML private TextField serverField;
     @FXML private TextField portField;
     @FXML private TextField usernameField;
@@ -25,12 +31,14 @@ public class LoginController {
 
     private ChatClient client;
 
+    /** Appelé par JavaFX après le chargement du FXML. Affiche les valeurs par défaut (serveur, port). */
     @FXML
     public void initialize() {
         serverField.setPromptText(AppConfig.getServerHost());
         portField.setPromptText(String.valueOf(AppConfig.getServerPort()));
     }
 
+    /** Clic sur "Connexion" : validation des champs, connexion au serveur, envoi de LOGIN. */
     @FXML
     public void handleLogin() {
         String server = serverField.getText().isBlank() ? AppConfig.getServerHost() : serverField.getText().trim();
@@ -61,6 +69,7 @@ public class LoginController {
         }
     }
 
+    /** Callback appelé à chaque ligne reçue du serveur. On découpe la commande et on réagit (sur le thread JavaFX). */
     private void handleServerResponse(String raw) {
         String[] parts = Protocol.parseCommand(raw);
         if (parts.length == 0) return;
@@ -93,6 +102,7 @@ public class LoginController {
         errorLabel.setText(message);
     }
 
+    /** Clic sur "S'inscrire" : aller à l'écran d'inscription. */
     @FXML
     public void goToRegister() {
         if (client != null) client.disconnect();

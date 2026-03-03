@@ -18,8 +18,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Contrôleur de l'écran de chat (chat.fxml).
+ * Affiche la liste des utilisateurs, la conversation avec l'utilisateur sélectionné,
+ * gère l'envoi/réception des messages, l'historique, le statut en ligne/hors ligne et les indicateurs "en train d'écrire".
+ * Les réponses du serveur arrivent dans un thread réseau, donc les mises à jour UI sont faites via Platform.runLater.
+ */
 public class ChatController {
 
+    // Éléments de l'interface (liés au FXML)
     @FXML private Label currentUserLabel;
     @FXML private ListView<String> userListView;
     @FXML private HBox errorBanner;
@@ -36,16 +43,17 @@ public class ChatController {
     private ChatClient client;
     private Long currentUserId;
     private String currentUsername;
-    private String selectedUser;
-    private final Map<String, String> userStatuses = new HashMap<>();
-    private final ObservableList<String> userList = FXCollections.observableArrayList();
-    private final Map<String, Long> lastMessageIds = new HashMap<>(); // messageId pour chaque conversation
-    private final Map<String, String> typingUsers = new HashMap<>(); // username -> "typing..."
-    private final Map<Long, HBox> messageBubbles = new HashMap<>(); // messageId -> bubble
+    private String selectedUser;   // Utilisateur avec qui on affiche la conversation
+    private final Map<String, String> userStatuses = new HashMap<>();  // username -> ONLINE/OFFLINE
+    private final ObservableList<String> userList = FXCollections.observableArrayList();  // Liste affichée dans la ListView
+    private final Map<String, Long> lastMessageIds = new HashMap<>();
+    private final Map<String, String> typingUsers = new HashMap<>();  // Utilisateurs "en train d'écrire"
+    private final Map<Long, HBox> messageBubbles = new HashMap<>();  // Pour mettre à jour statut/réactions d'un message
     private Timer typingTimer;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    /** Appelé par MainApp après chargement du FXML : enregistre le client et les callbacks, demande la liste des utilisateurs. */
     public void init(ChatClient client, Long userId, String username) {
         this.client = client;
         this.currentUserId = userId;
@@ -57,7 +65,7 @@ public class ChatController {
         client.setOnDisconnect(() -> Platform.runLater(this::handleDisconnect));
 
         userListView.setItems(userList);
-        userListView.setCellFactory(lv -> new UserListCell());
+        userListView.setCellFactory(lv -> new UserListCell());  // Cellule personnalisée (pastille + nom + statut)
 
         userListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
@@ -65,14 +73,11 @@ public class ChatController {
             }
         });
 
-        // Ajouter le listener pour le typing indicator
         messageInput.textProperty().addListener((obs, oldVal, newVal) -> {
             if (selectedUser != null && client != null) {
                 if (newVal.length() > 0 && oldVal.length() == 0) {
-                    // L'utilisateur commence à écrire
                     client.send(Protocol.buildCommand(Protocol.TYPING_START, selectedUser));
                 } else if (newVal.length() == 0 && oldVal.length() > 0) {
-                    // L'utilisateur arrête d'écrire
                     client.send(Protocol.buildCommand(Protocol.TYPING_STOP, selectedUser));
                 }
             }
@@ -81,6 +86,7 @@ public class ChatController {
         client.requestUserList();
     }
 
+    /** Traite chaque ligne reçue du serveur : dispatch selon la commande (USER_LIST, INCOMING_MSG, etc.). */
     private void handleServerMessage(String raw) {
         String[] parts = Protocol.parseCommand(raw);
         if (parts.length == 0) return;
@@ -99,7 +105,6 @@ public class ChatController {
                     case Protocol.MSG_STATUS_UPDATE -> handleMessageStatusUpdate(parts);
                     case Protocol.ERROR -> handleError(parts);
                     default -> {
-                        // Ignorer silencieusement les commandes inconnues pour éviter les erreurs
                         System.err.println("Commande inconnue ignorée: " + raw);
                     }
                 }
@@ -109,6 +114,7 @@ public class ChatController {
         });
     }
 
+    /** Met à jour la liste des utilisateurs à partir de USER_LIST|user1:ONLINE,user2:OFFLINE,... (en ligne en premier). */
     private void handleUserList(String[] parts) {
         if (parts.length < 2 || parts[1].isBlank()) return;
 
@@ -139,6 +145,7 @@ public class ChatController {
         userList.addAll(offlineUsers);
     }
 
+    /** Affiche un message reçu (INCOMING_MSG|sender|date|id|content) dans la zone de conversation si c'est la conversation ouverte. */
     private void handleIncomingMessage(String raw) {
         // INCOMING_MSG|sender|date|id|content (content last, may contain |)
         String[] parts = Protocol.parseCommand(raw, 5);
@@ -163,6 +170,7 @@ public class ChatController {
         showErrorBanner(msg);
     }
 
+    /** Décode HISTORY_DATA|base64(payload) et affiche les messages dans messagesContainer (format: sender::content::date::id::status). */
     private void handleHistoryData(String[] parts) {
         messagesContainer.getChildren().clear();
         if (parts.length < 2 || parts[1].isBlank()) return;
@@ -203,6 +211,7 @@ public class ChatController {
         scrollToBottom();
     }
 
+    /** Met à jour le statut d'un utilisateur (USER_STATUS_CHANGE|username|ONLINE|OFFLINE) et réordonne la liste. */
     private void handleUserStatusChange(String[] parts) {
         if (parts.length < 3) return;
         String username = parts[1];
@@ -223,6 +232,7 @@ public class ChatController {
         userListView.refresh();
     }
 
+    /** Trie la liste : utilisateurs en ligne d'abord, puis hors ligne, par ordre alphabétique. */
     private void sortUserList() {
         List<String> online = new ArrayList<>();
         List<String> offline = new ArrayList<>();
@@ -401,6 +411,7 @@ public class ChatController {
         }
     }
 
+    /** Utilisateur sélectionné dans la liste : afficher l'en-tête de conversation, charger l'historique, activer la zone de saisie. */
     private void selectUser(String username) {
         this.selectedUser = username;
 
@@ -420,6 +431,7 @@ public class ChatController {
         messageInput.requestFocus();
     }
 
+    /** Met à jour le nom et le statut (En ligne / Hors ligne) dans l'en-tête de la conversation. */
     private void updateChatHeader() {
         chatHeaderName.setText(selectedUser);
         String status = userStatuses.getOrDefault(selectedUser, "OFFLINE");
@@ -428,6 +440,7 @@ public class ChatController {
         chatHeaderStatus.getStyleClass().add("ONLINE".equals(status) ? "chat-header-status-online" : "chat-header-status-offline");
     }
 
+    /** Clic sur Envoyer : envoi du message au serveur, ajout de la bulle côté envoyé, vidage du champ. */
     @FXML
     public void handleSendMessage() {
         if (selectedUser == null) return;
@@ -449,6 +462,7 @@ public class ChatController {
         hideErrorBanner();
     }
 
+    /** Déconnexion : envoi de LOGOUT, retour à l'écran de connexion. */
     @FXML
     public void handleLogout() {
         if (client != null) {
@@ -461,6 +475,7 @@ public class ChatController {
         addMessageBubble(sender, content, dateStr, isMine, null);
     }
 
+    /** Ajoute une bulle de message dans la zone de conversation (alignement droite si c'est le nôtre, gauche sinon). */
     private void addMessageBubble(String sender, String content, String dateStr, boolean isMine, String statusStr) {
         VBox bubble = new VBox(4);
         bubble.setPadding(new Insets(0));
@@ -572,6 +587,7 @@ public class ChatController {
         }
     }
 
+    /** Fait défiler la zone des messages vers le bas (dernier message visible). */
     private void scrollToBottom() {
         Platform.runLater(() -> messagesScroll.setVvalue(1.0));
     }
@@ -588,7 +604,7 @@ public class ChatController {
         errorBanner.setManaged(false);
     }
 
-    /** Custom cell for user list with status indicator; styles from style.css */
+    /** Cellule personnalisée pour la liste des utilisateurs : pastille de statut (vert/gris) + nom + "En ligne" / "Hors ligne". */
     private class UserListCell extends ListCell<String> {
         @Override
         protected void updateItem(String item, boolean empty) {

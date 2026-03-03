@@ -3,29 +3,35 @@ package com.messagerie.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entité JPA représentant un utilisateur de l'application.
+ * Correspond à la table "users" en base de données.
+ */
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // ID auto-généré
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)  // Identifiant de connexion, unique en base
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false)  // Mot de passe (stocké hashé avec BCrypt en pratique)
     private String password;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)  // ONLINE ou OFFLINE, stocké comme chaîne
     @Column(nullable = false)
     private UserStatus status = UserStatus.OFFLINE;
 
     @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private LocalDateTime dateCreation = LocalDateTime.now();  // Date d'inscription
 
+    /** Constructeur sans argument requis par JPA */
     public User() {}
 
+    /** Constructeur pour créer un nouvel utilisateur (inscription) */
     public User(String username, String password) {
         this.username = username;
         this.password = password;
@@ -33,6 +39,7 @@ public class User {
         this.dateCreation = LocalDateTime.now();
     }
 
+    // ——— Getters et setters ———
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
