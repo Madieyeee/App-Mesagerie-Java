@@ -170,6 +170,12 @@ public class ChatController {
         showErrorBanner(msg);
     }
 
+    /** Indique si le nom d'expéditeur correspond à l'utilisateur connecté (insensible à la casse et aux espaces). */
+    private boolean isCurrentUser(String sender) {
+        if (sender == null || currentUsername == null) return false;
+        return sender.trim().equalsIgnoreCase(currentUsername.trim());
+    }
+
     /** Décode HISTORY_DATA|base64(payload) et affiche les messages dans messagesContainer (format: sender::content::date::id::status). */
     private void handleHistoryData(String[] parts) {
         messagesContainer.getChildren().clear();
@@ -197,14 +203,14 @@ public class ChatController {
                 } catch (IllegalArgumentException e) {
                     contenu = contentEncoded; // fallback si pas du base64
                 }
-                boolean isMine = sender.equals(currentUsername);
+                boolean isMine = isCurrentUser(sender);
                 addMessageBubble(sender, contenu, dateStr, isMine, statusStr);
             } else if (fields.length >= 3) {
                 // Ancien format sans statut / contenu non encodé (rétrocompat)
                 String sender = fields[0];
                 String contenu = fields[1];
                 String dateStr = fields[2];
-                boolean isMine = sender.equals(currentUsername);
+                boolean isMine = isCurrentUser(sender);
                 addMessageBubble(sender, contenu, dateStr, isMine, null);
             }
         }

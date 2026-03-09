@@ -91,24 +91,25 @@ public class ClientHandler implements Runnable {
             return;
         }
 
+        String canonicalUsername = user.getUsername();
         // RG3: un seul client connecté par compte (éviter deux sessions avec le même user)
         synchronized (connectedClients) {
-            if (connectedClients.containsKey(username)) {
+            if (connectedClients.containsKey(canonicalUsername)) {
                 sendMessage(Protocol.buildCommand(Protocol.ALREADY_CONNECTED, "Cet utilisateur est déjà connecté"));
                 return;
             }
-            connectedClients.put(username, this);
+            connectedClients.put(canonicalUsername, this);
         }
 
         this.currentUser = user;
         // RG4: statut ONLINE
         userDAO.updateStatus(user.getId(), UserStatus.ONLINE);
-        ServerLogger.logConnection(username);
+        ServerLogger.logConnection(canonicalUsername);
 
-        sendMessage(Protocol.buildCommand(Protocol.LOGIN_OK, String.valueOf(user.getId()), username));
+        sendMessage(Protocol.buildCommand(Protocol.LOGIN_OK, String.valueOf(user.getId()), canonicalUsername));
 
         // Notifier les autres utilisateurs du changement de statut
-        broadcastStatusChange(username, "ONLINE");
+        broadcastStatusChange(canonicalUsername, "ONLINE");
 
         // RG6: à la connexion, envoyer les messages reçus pendant l'absence
         deliverPendingMessages();
